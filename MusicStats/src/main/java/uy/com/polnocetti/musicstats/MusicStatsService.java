@@ -19,6 +19,9 @@ import uy.com.polnocetti.musicstats.database.MusicStatsDatabase;
 public class MusicStatsService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
+
+    private MusicStatsDatabase mDataAccess;
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -30,7 +33,12 @@ public class MusicStatsService extends Service {
             String album = intent.getStringExtra("album");
             String track = intent.getStringExtra("track");
 
-            Toast.makeText(MusicStatsService.this, artist + ":" + album + ":" + track, Toast.LENGTH_SHORT).show();
+            if (artist != null && album != null && track != null){
+                mDataAccess.newSong(artist, album, track);
+
+                Toast.makeText(MusicStatsService.this, artist + ":" + album + ":" + track, Toast.LENGTH_SHORT).show();
+            }
+
         }
 
     };
@@ -50,10 +58,10 @@ public class MusicStatsService extends Service {
 
         registerReceiver(mReceiver, iF);
 
-        MusicStatsDatabase dataAccess = new MusicStatsDatabase(getApplicationContext());
-        dataAccess.getWritableDatabase();
-        dataAccess.initializeDatabase();
-        dataAccess.close();
+        mDataAccess = new MusicStatsDatabase(getApplicationContext());
+        mDataAccess.getWritableDatabase();
+        mDataAccess.initializeDatabase();
+        mDataAccess.close();
 
     }
 
